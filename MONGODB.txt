@@ -1,0 +1,679 @@
+==>MONGODB is a NOSQL database that stores data in flexible, JSON-like documents, making it easy to scale and handle large volumes of unstructured data.
+
+==>MongoDB stores data in collections and documents. 
+
+
+A collection is a group of MongoDB documents 
+
+A document is a set of key-value pairs.
+
+
+MongoDB Basic Queries:
+======================================================================================================================================
+-->show dbs
+-->use database_name   -->creates DB
+-->db.collection_name.insertOne({name:"Sai",age:22})
+
+CREATE:
+=======
+db.createCollection("Employees")
+
+show collections
+
+DROP:
+=====
+db.Branches.drop()==> drops collection
+
+db.dropDatabase()==> drops database
+
+
+INSERT:
+====================================================================================================================================
+
+db.cars.insertOne(name:"sai",age:21)
+
+db.cars.insertMany([{},{},..])
+
+FIND:
+=====
+db.cars.find()  -->returns all the data available in it.
+
+db.cars.findOne() --> returns only first data in it.
+
+db.cars.find().pretty() -->organises the data .
+
+db.cars.find({},{model:1,_id:0}) --> returns the date of the attribute whose value is 1.
+
+
+db.cars.find({fuel_type:"Petrol"})  --> returns all the data of cars having petrol type.
+ 
+
+UPDATE:
+=====================================================================================================================================
+
+db.cars.updateOne( {model:"Nexon"},{$set:{color:"Red"}})  -->updates the car Nexon with adding color attribute.
+
+db.cars.updateOne( {model:"Nexon"}, {$push:{features:"Heated Seats"}})  -->here PUSH method overrides the data or adds additional data into the existing data.
+                                                                                
+db.cars.updateOne( {model:"Nexon"}, {$pull:{features:"Heated Seats"}})  -->here PULL method removes the data from the existing data.
+
+db.cars.updateMany( { fuel_type: "Diesel" }, { $set: { alloys: "yes" } } )  -->updates all the fields in the collection.
+
+db.cars.updateOne({model:"Nexon"},{$push:{features:{$each:["Wireless charging","Voice Control"]}}} ) --> adds multiple data into the feature using $each as an array.
+
+
+db.cars.updateOne({model:"Nexon"},{$unset:{color:""}}) -->$unset is used to remove the attribute from the collection.
+
+db.cars.updateMany({},{$set:{color:"Blue"}})  --> updates all the colors in the collection.
+
+db.cars.updateMany({model:"Venue"},{$set:{Maker:"Hyundai"}},{upsert:true})  -->UPSERT is used to insert and update at a time into the collection.
+
+
+
+DELETE:
+===========================================================================================================================================================
+
+db.cars.deleteOne({fuel_type:"Petrol"})  -->deletes the first matching value from the collection.
+
+db.cars.deleteMany({fuel_type:"Petrol"}) -->deletes all the matching value from the collection.
+
+
+
+REPLACE:
+===========================================================================================================================================================
+
+db.users.replaceOne(
+   { "_id": 1 },  // Filter condition: find document with _id: 1
+   {
+      "_id": 1,
+      "name": "Alice",
+      "age": 28,
+      "city": "Los Angeles"
+   }
+)
+
+
+DATE and TIME
+===========================================================================================================================================================
+
+db.test.insertOne({date:new Date}) -->adds present date into the test collection.
+
+db.test.insertOne({TS:new Timestamp}) -->adds present time into the test collection.
+
+
+COMPARISION OPERATORS:
+
+=============================================================================================================================================================
+db.cars.find({"engine.cc":{$gt:1400}}) --> returns data of the cars which contains cc greater than 1400.
+
+db.cars.find({"engine.cc":{$in:[1498,2179}}) --returns matches any of the values in an array
+
+db.cars.find({"engine.cc":{$nin:[1498,2179}}) --returns other than matches of the values in an array
+
+
+$eq -->equals
+$ne -->not equal
+$gt -->greater than
+$lt -->less than
+$lte -->less than equals
+$gte --> greater than equals
+$in --> matches any of the values in an array
+$nin --> other than matches of values in array
+
+LOGICAL OPERATORS:
+===============================================================================================================================================================
+
+db.cars.find({ $and: [ { fuel_type: "Diesel" }, { "engine.type": "Turbocharged" }] })  --> returns both of the attribute matched from the query.
+
+db.cars.find({ $or: [ { fuel_type: "Diesel" }, { "engine.type": "Turbocharged" }] })  --> returns either of the attribute matched from the query.
+
+db.cars.find({ $nor: [ { fuel_type: "Diesel" }, { "engine.type": "Turbocharged" }] })  --> returns neither of the attribute matched from the query.
+
+ db.cars.find({"engine.cc":{$not:{$gt:1400}}})  --> returns the cc data which is less than the cc given in the query.
+
+$and --> returns the data which satisfies both the conditions.
+$or --> returns the data which either of it satisfies the conditions.
+$and --> returns the data which neither of it satisfies the conditions.
+$not --> returns the data which is opposite to it.
+
+========================================================================================================================================================================
+ELEMENT OPEATIONS:
+======================================================================================================================================================================
+==> $exists
+==> $type
+
+
+db.cars.find({fuel_type:{$exists:true}}) --> returns data if the attribute exists in it or else returns nothing.
+
+db.cars.find({model:{$type:"string"}}) --> returns data if the attribute is of same datatype as mentioned in query or else returns nothing.
+
+========================================================================================================================================================================
+ARRAY OPERATORS:
+========================================================================================================================================================================
+
+==>$size
+
+==>$all
+
+db.cars.find({features:{$size:3}}) --> returns the data which contains size =3 as 3 elements present in it else returns nothing.
+
+db.cars.find({features:{$all:["Bluetooth","Sunroof"]}}) --> returns the data which matches the array elements from the collection.
+
+
+========================================================================================================================================================================
+CURSOR METHODS:
+========================================================================================================================================================================
+
+==>count()
+==>sort()  [if sort=-1,returns in descending order]
+==>limit()
+==>skip()
+
+
+db.cars.find().count()  --> returns the count of all documents.
+
+db.cars.find({fuel_type:"Petrol"}).count()  --> returns the count of matched attribute from the query.
+
+db.cars.find({},{_id:0,model:1,maker:1}).sort({model:1})  -->returns the sorted documents based on given attribute
+
+db.cars.find().limit(2)  -->returns the documents with the mentioned limit.
+
+db.cars.find().skip(2) -->skips the mentioned number of documents and returns remaining documents.
+
+
+
+========================================================================================================================================================================
+AGGREGATE OPERATIONS:
+========================================================================================================================================================================
+-----
+GROUP:
+------
+db.cars.aggregate([{$group:{_id:"maker"}}])  --> groups all the makers of all the documents in the collection.
+
+db.cars.aggregate([ {$group:{_id:"$maker",TotalCars:{$sum:1}}}]) --> groups all the makers and returns no. of cars in their respective group($sum=1) of all the documents in the collection.
+
+db.cars.aggregate([{$group:{_id:"$maker",AvgPrice:{$avg:"$price"}}}]) --> groups all the makers and returns the avg price of cars in their respective group of all the documents in the collection.
+
+------
+MATCH:
+------
+
+db.cars.aggregate([{$match:{maker:"Hyundai"}}])  -->matches all the makers with given value .
+
+db.cars.aggregate([{$match:{maker:"Hyundai","engine.cc":{$gt:1200}}}])  -->matches all the makers with given value and applies the condition.
+
+
+
+------
+COUNT:
+------
+db.cars.aggregate([{$match:{maker:"Hyundai"}},{$group:{_id:"$fuel_type",TotalCar:{$sum:1}}}])  -->returns all the Hyundai cars by grouping based on fuel_type with no. of cars present in it.
+
+
+-------
+PROJECT:
+-------
+This will return the documents but only include the specified fields.
+
+1 to include a field and 0 to exclude a field.
+
+
+db.cars.aggregate([
+    {$match:{
+        maker:"Hyundai"
+            }},
+    {$project:{			-->returns the data that matches Hyundai and displays with the mentioned attributes .
+        _id:0,
+        maker:1,
+        model:1,
+    fuel_type:1
+    }}
+])
+
+
+----
+SORT:
+-----
+While sorting Uppercase letters takes more priority than lowercase letters.
+Eg: Zebra > cat
+
+
+db.cars.aggregate([
+    {$match:{
+        maker:"Hyundai"
+            }},
+    {$project:{
+        _id:0,
+        maker:1,		--> sorts based on model.
+        model:1,
+    fuel_type:1
+    }},
+    {$sort:{model:1}}
+])
+
+
+-----------
+SORTBYCOUNT:
+------------
+sorts the document and also returns count of it.
+
+
+db.cars.aggregate([
+    {$sortByCount:"$maker"}        -->sorts based on maker and displays it with count.
+])
+
+
+-------
+UNWIND:
+-------
+Deconstructs an array field from the input documents to output a document for each element.
+
+
+db.cars.aggregate([{$unwind:"$owners"}])  -->returns the owners separated from the cars. If there are two owners then it returns 1st owner once and 2nd other next.
+
+
+
+
+========================================================================================================================================================================
+STRING OPERATORS:
+========================================================================================================================================================================
+-----
+CONCAT:
+-------
+
+joins the strings.
+
+
+db.cars.aggregate([
+    {$match:{maker:"Hyundai"}},   
+    {$project:{_id:0,Car_Name:{$concat:["$maker"," ","$model"]}}} 	-->matches the maker and concats the given attributes.
+
+])
+
+--------
+TOUPPER:
+--------
+displays in uppercase.
+
+db.cars.aggregate([
+    {$match:{maker:"Hyundai"}},
+    {$project:{_id:0,model:{$toUpper:"$model"}}}	-->matches the maker and displays in the uppercase with the given attributes.
+])
+
+
+db.cars.aggregate([
+    {$match:{maker:"Hyundai"}},
+    {$project:{_id:0,Car_Name:{$toUpper:{$concat:["$maker"," ","$model"]}}}}
+])
+
+--------
+TOLOWER:
+--------
+displays in Lowercase.
+
+db.cars.aggregate([
+    {$match:{maker:"Hyundai"}},
+    {$project:{_id:0,model:{$toLower:"$model"}}}	-->matches the maker and displays in the Lowercase with the given attributes.
+])
+
+
+db.cars.aggregate([
+    {$match:{maker:"Hyundai"}},
+    {$project:{_id:0,Car_Name:{$toUpper:{$concat:["$maker"," ","$model"]}}}}
+])
+
+
+------
+REGEX:
+------
+powerful tool that provides regular expression capabilities for pattern matching within strings in queries.
+
+
+db.cars.aggregate([
+     {$project:{_id:0,model:1,
+     is_diesel:{
+        $regexMatch:{			--> displays the cars with is_diesel is true or false.
+            input:"$fuel_type",
+            regex:"Dies"
+        }
+     }}}
+])
+
+
+-----
+OUT:
+-----
+After aggregating ,store the result in an another collection.
+
+db.cars.aggregate([
+    {$match:{maker:"Hyundai"}},
+    {$project:{_id:0,Car_Name:{$toUpper:{$concat:["$maker"," ","$model"]}},
+    }},
+    {$out:"Hyundai_Cars"}						-->stores the result in the "Hyundai_Cars"
+])
+
+
+----
+LTRIM:
+------
+removes whitespace from the beginning of a string. This includes the null character.
+
+db.pets.aggregate([
+  { 
+    $project: { 
+      name: 1, 						-->removes whitespaces at the beginning of the string
+      type: { $ltrim: { input: "$type" } } 
+    } 
+  }
+])
+
+
+------
+SPLIT:
+------
+Divides a string into an array of substrings based on a delimiter. $split removes the delimiter and returns the resulting substrings as elements of an array. If the delimiter is not found in the string, $split returns the original string as the only element of an array.
+
+{ $split: [ "June-15-2013", "-" ] }   --> returns [ "June", "15", "2013" ]
+
+
+
+
+========================================================================================================================================================================
+ARITHMETIC OPERATORS:
+========================================================================================================================================================================
+-->floor,abs,mod,sqrt,round,trunc
+
+
+ADD: same as subtract,multiply
+-----
+-->adds the array elements and returns the sum to the entire documents.
+
+
+db.cars.aggregate([
+    {$project:{				-->returns sum to all the documents.
+        sum:{$add:[1,2,3,4,5]}
+    }}
+])
+
+
+DIVIDE:
+------
+
+
+db.cars.aggregate([
+    {$project:{
+        _id:0,
+        model:1,
+        price:1
+    }},
+    {$addFields:{
+        prie_in_lakhs:{
+        $round:[{$divide:["$price",90000]},1]
+    }}
+        }
+])
+
+
+SET:
+=====
+--> the $set operator will update or create each field if you specify multiple field-value pairs.
+
+
+db.cars.aggregate([
+    {$match:{maker:"Hyundai"}},
+    {$set:{
+        total_service_cost:{
+            $sum:"$service_history.cost"
+        }
+    }},
+    {$project:{
+        _id:0,
+        model:1,
+        total_service_cost:1
+    }}
+])
+
+
+
+========================================================================================================================================================================
+CONDITIONAL OPERATORS:
+========================================================================================================================================================================
+
+$cond:
+=====
+Evaluates a boolean expression to return one of the two specified return expressions.
+
+db.cars.aggregate([
+    {$project:{
+        _id:0,
+        maker:1,
+        model:1,		--> categories cars into petrol and non-petrol cars.
+        fuel_category:{
+            $cond:{
+                if:{$eq:["$fuel_type","Petrol"]},
+                then:"Petrol Car",
+                else:"Non-Petrol Car"
+            }
+        }
+    }}
+])
+
+
+========
+$switch:
+========
+same as switch in C language.
+
+
+db.cars.aggregate([
+    $project:{
+        _id:0,maker:1,model:1,
+        Budget_cat:{
+            $switch:{
+                branches:[
+                    {
+                        case:{$lt:["$price",500000]},
+                        then:"Budget"
+                    },
+
+                    {
+                        case:{$and:[{$gte:["$price",500000]},{$lte:["$price",1000000]}]},
+                        then: "Mid-Range"
+                    },
+                    {
+                        case: {$gt:["price",1000000]},
+                        then:"Premium"
+                    }
+                    
+                ],
+                default:"Unknown"
+            }
+        }
+      }  
+])
+
+
+
+
+========================================================================================================================================================================
+DATE OPERATORS:
+========================================================================================================================================================================
+
+db.cars.aggregate([
+    {
+    $project:{
+        newDate:{
+            $dateAdd:{
+                startDate:new Date("2024-08-28"),
+                unit:"day",
+                amount:7
+            }
+        }
+    }}
+])
+
+
+-->prints system urrent date and time.
+
+db.cars.aggregate([
+    {$project:{
+        _id:0,
+        model:1,
+        date:"$$NOW"
+    }}
+])
+
+
+
+========================================================================================================================================================================
+USER-DEFINED VARIABLES:
+========================================================================================================================================================================
+
+-->first declare and initialize the variable and then use it.
+
+Eg1:
+	db.cars.find({price:my_price})  --> error as not-defined
+
+	my_price=1500000	-->define it.
+	
+	db.cars.find({price:my_price}) -->use it.
+
+
+
+Eg2:
+	hyundai={maker:"Hyundai"}
+	
+	 db.cars.find(hyundai)  --> returns all the Hyundai cars.
+
+
+========================================================================================================================================================================
+$lookup:
+========================================================================================================================================================================
+is a powerful tool used for performing left outer joins between documents from two collections. 
+
+Syntax:  {
+  $lookup: {
+    from: <foreignCollection>,
+    localField: <fieldInInputDocument>,
+    foreignField: <fieldInForeignDocument>,
+    as: <outputArrayField>
+  }
+}
+
+
+Eg:
+
+db.user.aggregate([
+    {$lookup:{
+        from:"orders",
+        localField:"_id",
+        foreignField:"user_id",
+        as:"orders"
+    }}
+])
+
+
+========================================================================================================================================================================
+Schema Validation:
+========================================================================================================================================================================
+-->used for giving same no. of parameters and same datatype to the document otherwise it gives error.
+
+db.createCollection("users2",{
+    validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            required:["name","phone"],
+            properties:{
+                name:{
+                    bsonType:"string",
+                    description:"Name should be string"
+                }
+            }
+        }
+    }
+})
+
+
+
+
+========================================================================================================================================================================
+INDEXES:
+========================================================================================================================================================================
+
+--> is a data structure that improves the speed of query operations by allowing the database to quickly locate and access the required data without scanning every document in a collection.
+
+--> stores the indexed fields in a sorted order, along with pointers to the actual documents in the collection.
+
+Syntax:
+-------
+	db.COLLECTION_NAME.createIndex({KEY:1}) -->creating index
+	
+	db.NAME_OF_COLLECTION.dropIndex({KEY:1}) -->deleting index	
+
+	db.NAME_OF_COLLECTION.getIndexes() -->retriving index
+
+
+Eg:
+
+	db.cars.createIdex({maker:1})
+
+	db.cars.dropindex("maker")
+	
+	db.cars.getIndexes()
+
+
+
+========================================================================================================================================================================
+TRANSACTION:
+========================================================================================================================================================================
+
+--> is a sequences of operations that are executed as a single unit,ensuring tha all operations either complete successfully or are fully rolled back,maintaining ACID properties across multiple documents and collections.
+
+
+
+======================================================================================================================================================================
+SHARDING:
+========================================================================================================================================================================
+
+--> is a method of distributing data across multiple servers(shards) to enable horizontal scaling, allowing the database to handle large datasets and high-throughput operations efficiently.
+
+
+======================================================================================================================================================================
+REPLICATION:
+========================================================================================================================================================================
+
+--> is a group of MongoDB servers that maintain identical copies of data to ensure high availability, redundancy and data durability with one primary node handling writes and multiple secondary nodes replicating the data.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
